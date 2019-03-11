@@ -16,7 +16,9 @@ public class PluginDateUtils {
      * @return
      */
     public static String formatToString(Date date) {
-
+        if (null == date) {
+            return null;
+        }
         return SIMPLE_DATE_FORMAT.format(date);
     }
 }

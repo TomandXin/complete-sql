@@ -21,8 +21,10 @@ import java.util.Properties;
  * @date 2019-03-10
  * @since v1.0.0
  */
-@Intercepts({@Signature(type = Executor.class, method = "query",
-        args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class})})
+@Intercepts({
+        @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}),
+        @Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class})
+})
 public class CompleteSqlPlugin implements Interceptor {
 
 
@@ -105,9 +107,14 @@ public class CompleteSqlPlugin implements Interceptor {
             if (parameterMapping.getJavaType().equals(Date.class)) {
                 value = PluginDateUtils.formatToString((Date) value);
             }
-            originalSql.replaceFirst("\\?", value.toString());
+            if (null == value) {
+                originalSql = originalSql.replaceFirst("\\?", "");
+                continue;
+            }
+            originalSql = originalSql.replaceFirst("\\?", value.toString());
         }
         System.out.println("=======================complete sql start=============================");
+        System.out.println("originalSql [ " + boundSql.getSql() + " ]");
         System.out.println("tom plugin print complete sql [ " + originalSql + " ]");
         System.out.println("=======================complete sql end===============================");
     }
